@@ -3,7 +3,8 @@ import "./helpers/Globals";
 import "p5/lib/addons/p5.sound";
 import * as p5 from "p5";
 import { Midi } from '@tonejs/midi'
-import PlayIcon from './functions/PlayIcon.js';
+import PlayIcon from './functions/PlayIcon';
+import BouncingBall from './classes/BouncingBall';
 
 import audio from "../audio/bouncing-balls-no-1.ogg";
 import midi from "../audio/bouncing-balls-no-1.mid";
@@ -28,8 +29,13 @@ const P5SketchWithAudio = () => {
         p.loadMidi = () => {
             Midi.fromUrl(midi).then(
                 function(result) {
-                    const noteSet1 = result.tracks[3].notes; // Synth 1
+                    console.log(result);
+                    const noteSet1 = result.tracks[3].notes; // Sampler 2 - Twinkle Stars
+                    const noteSet2 = result.tracks[1].notes; // Synth 2 - DreamPatch 1
+                    const noteSet3 = result.tracks[2].notes; // Synth 3 - Laid Down
                     p.scheduleCueSet(noteSet1, 'executeCueSet1');
+                    p.scheduleCueSet(noteSet2, 'executeCueSet2');
+                    p.scheduleCueSet(noteSet3, 'executeCueSet3');
                     p.audioLoaded = true;
                     document.getElementById("loader").classList.add("loading--complete");
                     document.getElementById("play-icon").classList.remove("fade-out");
@@ -60,98 +66,141 @@ const P5SketchWithAudio = () => {
 
         p.setup = () => {
             p.canvas = p.createCanvas(p.canvasWidth, p.canvasHeight, p.WEBGL);
-            console.log(p.canvas);
+            p.colorMode(p.HSB);
             p.smooth();
             p.background(0);
+            const bigBall = new BouncingBall(
+                p, 
+                0,
+                0,
+                0,
+                p.random(p.height / 8, p.height / 16), 
+                16,
+                'random',
+                p.random(0, 360),
+                p.random(0, 360),
+                false
+            );
+            bigBall.canDraw = false;
+            p.balls.push(bigBall);
         }
 
-        p.xPos=0;
-        p.yPos=0;
-        p.zPos=0;
-
-        p.xSpeed=4;
-        p.ySpeed=4;
-        p.zSpeed=4;
-
-        p.xDirection=1;
-        p.yDirection=1;
-        p.zDirection=1;
+        p.balls = [];
 
         p.draw = () => {
-            p.background(0);
-            p.lights();
-
-
-            // box setup
-            p.stroke(255);
-
-            const dist = p.height / 2;
-
-            // background square
-            p.translate (-p.width/2, -p.height/2, 0);
-            p.line(0, 0, -dist, p.width, 0, -dist);
-            p.line(0, 0, -dist, 0, p.height, -dist);
-            p.line(0, p.height, -dist, p.width, p.height, -dist);
-            p.line(p.width, p.height, -dist, p.width, 0, -dist);
-
-            // perspective lines
-            p.line(0, 0, -dist, 0, 0, 0);
-            p.line(p.width, 0, -dist, p.width, 0, 0);
-            p.line(0, p.height, -dist, 0, p.height, 0);
-            p.line(p.width, p.height, -dist, p.width, p.height, 0);
-            p.translate (p.width/2, p.height/2, 0);
-
-
-            // inital ball set up
-
-            p.translate (p.xPos, p.yPos, -p.zPos);
-            p.emissiveMaterial(255, 0, 0);
-            p.shininess(100);
-            p.fill(255, 0, 0);
-            p.stroke(0, 0, 255);
-            p.sphere(100);
-            
-
-            // motion setup
-
-            p.xPos = p.xPos + (p.xSpeed * p.xDirection);  
-            p.yPos = p.yPos + (p.ySpeed * p.yDirection); 
-            p.zPos = p.zPos + (p.zSpeed * p.zDirection);
-
-            if (p.xPos > ((p.width / 2) - 100)) {
-                p.xDirection =- 1;
-            }
-
-            if (p.yPos > (dist - 100)) {
-                p.yDirection =- 1;
-            }
-
-            if (p.zPos > dist) {
-                p.zDirection =- 1;
-            }
-
-            if (p.xPos <  -((p.width / 2) - 100)) {
-                p.xDirection =+ 1;
-            }
-
-            if (p.yPos< -(dist - 100)) {
-                p.yDirection =+ 1;
-            }
-
-            if (p.zPos < 0) {
-                p.zDirection =+ 1;
-            }
-            
+            let locX = p.mouseX - p.height / 2;
+            let locY = p.mouseY - p.width / 2;
+            p.ambientLight(60, 60, 60);
+            p.pointLight(255, 255, 255, locX, locY, 100);
             if(p.audioLoaded && p.song.isPlaying()){
+                p.background(0);
+                p.lights();
 
+                const dist = p.height / 2;
+                p.stroke(255);
+                // background square
+                p.translate (-p.width/2, -p.height/2, 0);
+                p.line(0, 0, -dist, p.width, 0, -dist);
+                p.line(0, 0, -dist, 0, p.height, -dist);
+                p.line(0, p.height, -dist, p.width, p.height, -dist);
+                p.line(p.width, p.height, -dist, p.width, 0, -dist);
+                // perspective lines
+                p.line(0, 0, -dist, 0, 0, 0);
+                p.line(p.width, 0, -dist, p.width, 0, 0);
+                p.line(0, p.height, -dist, 0, p.height, 0);
+                p.line(p.width, p.height, -dist, p.width, p.height, 0);
+                p.translate (p.width/2, p.height/2, 0);
+                
+                for (let i = 0; i < p.balls.length; i++) {
+                    const ball = p.balls[i];
+                    ball.draw();
+                }
             }
         }
 
-        p.executeCueSet1 = (note) => {
-            p.background(p.random(255), p.random(255), p.random(255));
-            p.fill(p.random(255), p.random(255), p.random(255));
-            p.noStroke();
-            p.ellipse(p.width / 2, p.height / 2, p.width / 4, p.width / 4);
+        p.boxCorners = [];
+
+        p.executeCueSet1 = () => {
+            p.balls.push(
+                new BouncingBall(
+                    p, 
+                    p.random(-p.width/8, p.width/8), 
+                    -p.height/2, 
+                    p.random(-p.height/8, p.height/8), 
+                    p.height / 24, 
+                    24,
+                    'up-down',
+                    p.random(0, 360),
+                    p.random(0, 360)
+                )
+            );
+        }
+
+        p.executeCueSet2 = (note) => {
+            // p.balls.push(
+            //     new BouncingBall(
+            //         p, 
+            //         -p.width/2, 
+            //         p.random(-p.height/4, p.height/4), 
+            //         p.random(-p.height/4, p.height/4), 
+            //         p.height / 24, 
+            //         24,
+            //         'left-right',
+            //         p.random(0, 360),
+            //         p.random(0, 360)
+            //     )
+            // )
+        }
+
+        p.executeCueSet3 = (note) => {
+            const ball = p.balls[0]
+            ball.canDraw = true;
+        }
+
+        p.loadBoxCorners = () => {
+            const dist = p.height / 2;
+            p.boxCorners = [
+                {
+                    x: -p.width/2,
+                    y: -p.height/2,
+                    z: 0
+                },
+                {
+                    x: p.width/2,
+                    y: -p.height/2,
+                    z: 0
+                },
+                {
+                    x: -p.width/2,
+                    y: p.height/2,
+                    z: 0
+                },
+                {
+                    x: p.width/2,
+                    y: p.height/2,
+                    z: 0
+                },
+                {
+                    x: -p.width/2,
+                    y: -p.height/2,
+                    z: -dist
+                },
+                {
+                    x: p.width/2,
+                    y: -p.height/2,
+                    z: -dist
+                },
+                {
+                    x: -p.width/2,
+                    y: p.height/2,
+                    z: -dist
+                },
+                {
+                    x: p.width/2,
+                    y: p.height/2,
+                    z: -dist
+                },
+            ];
         }
 
         p.mousePressed = () => {
