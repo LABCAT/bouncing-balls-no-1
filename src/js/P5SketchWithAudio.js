@@ -5,6 +5,7 @@ import * as p5 from "p5";
 import { Midi } from '@tonejs/midi'
 import PlayIcon from './functions/PlayIcon';
 import BouncingBall from './classes/BouncingBall';
+import NaturalBouncingBall from './classes/NaturalBouncingBall';
 
 import audio from "../audio/bouncing-balls-no-1.ogg";
 import midi from "../audio/bouncing-balls-no-1.mid";
@@ -31,11 +32,13 @@ const P5SketchWithAudio = () => {
                 function(result) {
                     console.log(result);
                     const noteSet1 = result.tracks[3].notes; // Sampler 2 - Twinkle Stars
-                    const noteSet2 = result.tracks[1].notes; // Synth 2 - DreamPatch 1
-                    const noteSet3 = result.tracks[2].notes; // Synth 3 - Laid Down
+                    const noteSet2 = result.tracks[5].notes.filter(note => note.midi !== 43); // Redrum 1 - Abstract Kit 01
+                    const noteSet3 = result.tracks[0].notes; // Synth 1 - HyperBottom
+                    const noteSet4 = result.tracks[2].notes; // Synth 3 - Laid Down
                     p.scheduleCueSet(noteSet1, 'executeCueSet1');
                     p.scheduleCueSet(noteSet2, 'executeCueSet2');
                     p.scheduleCueSet(noteSet3, 'executeCueSet3');
+                    p.scheduleCueSet(noteSet4, 'executeCueSet4');
                     p.audioLoaded = true;
                     document.getElementById("loader").classList.add("loading--complete");
                     document.getElementById("play-icon").classList.remove("fade-out");
@@ -77,8 +80,8 @@ const P5SketchWithAudio = () => {
                 p.random(p.height / 8, p.height / 16), 
                 16,
                 'random',
-                p.random(0, 360),
-                p.random(0, 360),
+                p.color(p.random(0, 360), 100, 100),
+                p.color(p.random(0, 360), 100, 100),
                 false
             );
             bigBall.canDraw = false;
@@ -127,34 +130,55 @@ const P5SketchWithAudio = () => {
                     p.random(-p.width/8, p.width/8), 
                     -p.height/2, 
                     p.random(-p.height/8, p.height/8), 
-                    p.height / 24, 
+                    p.height / 16, 
                     24,
                     'up-down',
-                    p.random(0, 360),
-                    p.random(0, 360)
+                    p.color(p.random(0, 360), 100, 0),
+                    p.color(p.random(0, 360), 100, 100)
                 )
             );
         }
 
         p.executeCueSet2 = (note) => {
-            // p.balls.push(
-            //     new BouncingBall(
-            //         p, 
-            //         -p.width/2, 
-            //         p.random(-p.height/4, p.height/4), 
-            //         p.random(-p.height/4, p.height/4), 
-            //         p.height / 24, 
-            //         24,
-            //         'left-right',
-            //         p.random(0, 360),
-            //         p.random(0, 360)
-            //     )
-            // )
+            const { midi } = note,
+                fill = midi === 36 ? p.color(0, 100, 0) : p.color(0, 0, 100),
+                stroke = midi === 36 ? p.color(0, 0, 100) : p.color(0, 100, 0);
+            p.balls.push(
+                new NaturalBouncingBall(
+                    p, 
+                    (-p.width / 2) - (p.height / 16 * 8), 
+                    -p.height/2, 
+                    p.height, 
+                    p.height / 16, 
+                    24,
+                    'right',
+                    fill,
+                    stroke,
+                    false
+                )
+            );
         }
 
         p.executeCueSet3 = (note) => {
-            const ball = p.balls[0]
-            ball.canDraw = true;
+            // p.balls.push(
+            //     new BouncingBall(
+            //         p, 
+            //         0,
+            //         0,
+            //         0,
+            //         p.random(p.height / 12, p.height / 24), 
+            //         16,
+            //         'random',
+            //         p.color(p.random(0, 360), 100, 100),
+            //         p.color(p.random(0, 360), 100, 100),
+            //         false
+            //     )
+            // );
+        }
+
+        p.executeCueSet4 = (note) => {
+            // const ball = p.balls[0]
+            // ball.canDraw = true;
         }
 
         p.loadBoxCorners = () => {

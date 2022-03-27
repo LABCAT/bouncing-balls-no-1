@@ -1,5 +1,5 @@
 export default class BouncingBall {
-    constructor(p5, xPos, yPos, zPos, size, speed, direction, fillHue, strokeHue, canShrink = true ) {
+    constructor(p5, xPos, yPos, zPos, size, speed, direction, fill, stroke, canShrink = true ) {
         this.p = p5;
         this.canDraw = true;
 
@@ -9,8 +9,8 @@ export default class BouncingBall {
 
         this.size = size;
         this.direction = direction;
-        this.fillHue = fillHue;
-        this.strokeHue = strokeHue;
+        this.fill = fill;
+        this.stroke = stroke;
         this.canShrink = canShrink;
 
         this.xSpeed = speed;
@@ -20,15 +20,20 @@ export default class BouncingBall {
         this.xDirection = 1;
         this.yDirection = 1;
         this.zDirection = 1;
+
+        this.topBounds = -this.p.height / 2;
+        this.bottomBounds = this.p.height / 2;
+        this.leftBounds = -this.p.width / 2;
+        this.rightBounds = this.p.width / 2;
+        this.backBounds = -this.p.height / 2;
+        this.frontBounds = this.p.height / 2;
     }
 
     draw() {
         if(this.canDraw) {
             this.p.translate (this.xPos, this.yPos, -this.zPos);
-            this.p.ambientMaterial(this.fillHue, 100, 100);
-            this.p.fill(this.fillHue, 100, 100);
-            this.p.stroke(this.strokeHue, 100, 100);
-            // this.p.noStroke();
+            this.p.ambientMaterial(this.fill);
+            this.p.stroke(this.stroke);
             this.p.sphere(this.size);
 
             // motion setup
@@ -43,34 +48,33 @@ export default class BouncingBall {
             if(['back-forth', 'random'].includes(this.direction)) {
                 this.zPos = this.zPos + (this.zSpeed * this.zDirection);
             }
-            
 
             if(['left-right', 'random'].includes(this.direction)) {
-                if (this.xPos > ((this.p.width / 2) - 100)) {
+                if (this.xPos > this.rightBounds - this.size) {
                     this.xDirection =- 1;
                 }
 
-                if (this.xPos <  -((this.p.width / 2) - 100)) {
+                if (this.xPos < this.leftBounds - this.size) {
                     this.xDirection =+ 1;
                 }
             }
 
             if(['up-down', 'random'].includes(this.direction)) {
-                if (this.yPos > ((this.p.height / 2) - 100)) {
+                if (this.yPos > this.bottomBounds - this.size) {
                     this.yDirection =- 1;
                 }
 
-                if (this.yPos < -((this.p.height / 2) - 100)) {
+                if (this.yPos < this.topBounds - this.size) {
                     this.yDirection =+ 1;
                 }
             }
 
             if(['back-forth', 'random'].includes(this.direction)) {
-                if (this.zPos > (this.p.height / 2)) {
+                if (this.zPos > this.frontBounds) {
                     this.zDirection =- 1;
                 }
 
-                if (this.zPos < 0) {
+                if (this.zPos < this.backBounds) {
                    this.zDirection =+ 1;
                 }
             }
