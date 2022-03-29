@@ -80,7 +80,7 @@ export default class BouncingBall {
             }
             
             if(this.canShrink) {
-                this.size = this.size - 0.2;
+                this.size = this.size - 0.75;
                 if(this.size <= 0) {
                     this.canDraw = false;
                 }

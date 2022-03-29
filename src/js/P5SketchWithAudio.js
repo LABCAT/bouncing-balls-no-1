@@ -31,10 +31,11 @@ const P5SketchWithAudio = () => {
             Midi.fromUrl(midi).then(
                 function(result) {
                     console.log(result);
-                    const noteSet1 = result.tracks[3].notes; // Sampler 2 - Twinkle Stars
+                    const noteSet1 = result.tracks[1].notes; // Synth 2 - DreamPatch 1
                     const noteSet2 = result.tracks[5].notes.filter(note => note.midi !== 43); // Redrum 1 - Abstract Kit 01
                     const noteSet3 = result.tracks[0].notes; // Synth 1 - HyperBottom
-                    const noteSet4 = result.tracks[2].notes; // Synth 3 - Laid Down
+                    const noteSet4 = result.tracks[3].notes; // Sampler 2 - Twinkle Stars
+                    //const noteSet4 = result.tracks[2].notes; // Synth 3 - Laid Down
                     p.scheduleCueSet(noteSet1, 'executeCueSet1');
                     p.scheduleCueSet(noteSet2, 'executeCueSet2');
                     p.scheduleCueSet(noteSet3, 'executeCueSet3');
@@ -102,17 +103,17 @@ const P5SketchWithAudio = () => {
                 const dist = p.height / 2;
                 p.stroke(255);
                 // background square
-                p.translate (-p.width/2, -p.height/2, 0);
-                p.line(0, 0, -dist, p.width, 0, -dist);
-                p.line(0, 0, -dist, 0, p.height, -dist);
-                p.line(0, p.height, -dist, p.width, p.height, -dist);
-                p.line(p.width, p.height, -dist, p.width, 0, -dist);
-                // perspective lines
-                p.line(0, 0, -dist, 0, 0, 0);
-                p.line(p.width, 0, -dist, p.width, 0, 0);
-                p.line(0, p.height, -dist, 0, p.height, 0);
-                p.line(p.width, p.height, -dist, p.width, p.height, 0);
-                p.translate (p.width/2, p.height/2, 0);
+                // p.translate (-p.width/2, -p.height/2, 0);
+                // p.line(0, 0, -dist, p.width, 0, -dist);
+                // p.line(0, 0, -dist, 0, p.height, -dist);
+                // p.line(0, p.height, -dist, p.width, p.height, -dist);
+                // p.line(p.width, p.height, -dist, p.width, 0, -dist);
+                // // perspective lines
+                // p.line(0, 0, -dist, 0, 0, 0);
+                // p.line(p.width, 0, -dist, p.width, 0, 0);
+                // p.line(0, p.height, -dist, 0, p.height, 0);
+                // p.line(p.width, p.height, -dist, p.width, p.height, 0);
+                // p.translate (p.width/2, p.height/2, 0);
                 
                 for (let i = 0; i < p.balls.length; i++) {
                     const ball = p.balls[i];
@@ -123,62 +124,115 @@ const P5SketchWithAudio = () => {
 
         p.boxCorners = [];
 
-        p.executeCueSet1 = () => {
-            p.balls.push(
-                new BouncingBall(
-                    p, 
-                    p.random(-p.width/8, p.width/8), 
-                    -p.height/2, 
-                    p.random(-p.height/8, p.height/8), 
-                    p.height / 16, 
-                    24,
-                    'up-down',
-                    p.color(p.random(0, 360), 100, 0),
-                    p.color(p.random(0, 360), 100, 100)
-                )
-            );
+        p.cueSet1Direction = 'forward-left';
+
+        p.executeCueSet1 = (note) => {
+            const { currentCue } = note;
+
+            if(currentCue % 16 === 1 && currentCue > 1){
+                p.cueSet1Direction = p.cueSet1Direction === 'forward-right' ? 'forward-left' : 'forward-right';
+            }
+
+            const x = p.cueSet1Direction === 'forward-right' ? -p.width / 2 : p.width / 2;
+
+            if(currentCue % 16 > 5) {
+                p.balls.push(
+                    new NaturalBouncingBall(
+                        p, 
+                        x, 
+                        -p.height/2, 
+                        0, 
+                        p.height / 16, 
+                        36,
+                        p.cueSet1Direction,
+                        p.color(p.random(0, 360), 100, 0),
+                        p.color(p.random(0, 360), 100, 100),
+                        false
+                    )
+                );
+            }
         }
 
         p.executeCueSet2 = (note) => {
             const { midi } = note,
                 fill = midi === 36 ? p.color(0, 100, 0) : p.color(0, 0, 100),
                 stroke = midi === 36 ? p.color(0, 0, 100) : p.color(0, 100, 0);
+  
+             p.balls.push(
+                new BouncingBall(
+                    p, 
+                    p.random(-p.width/8, p.width/8), 
+                    -p.height / 2, 
+                    p.random(-p.height/8, p.height/8), 
+                    p.height / 16, 
+                    24,
+                    'up-down',
+                    fill,
+                    stroke
+                )
+            );
+        }
+
+        p.cueSet3Direction = 'right';
+
+        p.executeCueSet3 = (note) => {
+            const { currentCue } = note;
+
+            if(currentCue % 16 === 1 && currentCue > 1){
+                p.cueSet3Direction = p.cueSet3Direction === 'right' ? 'left' : 'right';
+            }
+
+            if(currentCue > 64 && currentCue < 81) {
+                p.cueSet3Direction = 'forward';
+            }
+
+            const x = p.cueSet3Direction === 'forward' ? p.random([(-p.width / 2 - p.height), (p.width / 2 + p.height)]) :
+                p.cueSet3Direction === 'right' ? -p.width / 2 : p.width / 2,
+                size = p.cueSet3Direction === 'forward' ? p.height / 4 : p.height / 16,
+                speed = p.cueSet3Direction === 'forward' ? 36 : 24;
+
+
             p.balls.push(
                 new NaturalBouncingBall(
                     p, 
-                    (-p.width / 2) - (p.height / 16 * 8), 
-                    -p.height/2, 
-                    p.height, 
-                    p.height / 16, 
-                    24,
-                    'right',
-                    fill,
-                    stroke,
+                    x, 
+                    0, 
+                    0, 
+                    size, 
+                    speed,
+                    'forward',
+                    p.color(p.random(0, 360), 0, 25, 0.5),
+                    p.color(p.random(0, 360), 100, 100),
                     false
                 )
             );
         }
 
-        p.executeCueSet3 = (note) => {
-            // p.balls.push(
-            //     new BouncingBall(
-            //         p, 
-            //         0,
-            //         0,
-            //         0,
-            //         p.random(p.height / 12, p.height / 24), 
-            //         16,
-            //         'random',
-            //         p.color(p.random(0, 360), 100, 100),
-            //         p.color(p.random(0, 360), 100, 100),
-            //         false
-            //     )
-            // );
-        }
+        p.cueSet4Direction = 'forward-left';
 
         p.executeCueSet4 = (note) => {
-            // const ball = p.balls[0]
-            // ball.canDraw = true;
+            const { currentCue } = note;
+
+            if(currentCue % 7 === 6){
+                p.cueSet4Direction = p.cueSet4Direction === 'forward-right' ? 'forward-left' : 'forward-right';
+            }
+
+            const x = p.cueSet4Direction === 'forward-right' ? -p.width / 2 : p.width / 2;
+
+            p.balls.push(
+                new NaturalBouncingBall(
+                    p, 
+                    x, 
+                    -p.height/2, 
+                    0, 
+                    p.height / 8, 
+                    36,
+                    p.cueSet4Direction,
+                    p.color(p.random(0, 360), 100, 100),
+                    p.color(p.random(0, 360), 100, 0),
+                    false
+                )
+            );
         }
 
         p.loadBoxCorners = () => {

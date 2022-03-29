@@ -9,12 +9,26 @@ export default class NaturalBouncingBall extends BouncingBall {
     draw() {
         super.draw();
 
-        if(['left', 'right'].includes(this.direction)) {
-            if(['left'].includes(this.direction)) {
-                this.xPos = this.xPos - (this.xSpeed * this.xDirection);  
+        if(this.canDraw) {
+            if(['left', 'right'].includes(this.direction)) {
+                if(['left'].includes(this.direction)) {
+                    this.xPos = this.xPos - (this.xSpeed * this.xDirection);  
+                }
+                else {
+                    this.xPos = this.xPos + (this.xSpeed * this.xDirection);  
+                }
+
+                
             }
-            else {
-                this.xPos = this.xPos + (this.xSpeed * this.xDirection);  
+            if(['forward', 'forward-left', 'forward-right'].includes(this.direction)) {
+                if(['forward-left'].includes(this.direction)) {
+                    this.xPos = this.xPos - (this.xSpeed * this.xDirection);  
+                }
+                else if(['forward-right'].includes(this.direction)) {
+                    this.xPos = this.xPos + (this.xSpeed * this.xDirection);  
+                }
+
+                this.zPos = this.zPos + (this.zSpeed * this.zDirection);
             }
 
             this.yPos = this.yPos + (this.ySpeed * this.yDirection);
@@ -27,8 +41,10 @@ export default class NaturalBouncingBall extends BouncingBall {
                 this.yDirection =+ 1;
             }
 
-            this.topBounds = this.topBounds * this.p.random(0.9, 0.99);
+            this.topBounds = this.topBounds * this.p.random(0.95, 0.99);
         }
+
+       
 
     }
 }
