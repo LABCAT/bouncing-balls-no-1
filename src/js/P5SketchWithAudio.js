@@ -140,7 +140,7 @@ const P5SketchWithAudio = () => {
                     new NaturalBouncingBall(
                         p, 
                         x, 
-                        -p.height/2, 
+                        -p.height/2,
                         0, 
                         p.height / 16, 
                         36,
@@ -173,39 +173,35 @@ const P5SketchWithAudio = () => {
             );
         }
 
-        p.cueSet3Direction = 'right';
+        p.cueSet3Direction = 'forward-right';
 
         p.executeCueSet3 = (note) => {
             const { currentCue } = note;
 
-            if(currentCue % 16 === 1 && currentCue > 1){
-                p.cueSet3Direction = p.cueSet3Direction === 'right' ? 'left' : 'right';
+            if(currentCue > 64) {
+                if(currentCue === 65) {
+                    p.balls = [];
+                }
+
+                p.cueSet3Direction = p.cueSet3Direction === 'forward-left' ? 'forward-right' : 'forward-left';
+
+                p.balls.push(
+                    new NaturalBouncingBall(
+                        p, 
+                        0,
+                        -p.height / 2,  
+                        0, 
+                        p.height / 6,
+                        48,
+                        p.cueSet3Direction,
+                        p.color(p.random(0, 360), 0, 25, 0.75),
+                        p.color(p.random(0, 360), 100, 100),
+                        false
+                    )
+                );
             }
 
-            if(currentCue > 64 && currentCue < 81) {
-                p.cueSet3Direction = 'forward';
-            }
-
-            const x = p.cueSet3Direction === 'forward' ? p.random([(-p.width / 2 - p.height), (p.width / 2 + p.height)]) :
-                p.cueSet3Direction === 'right' ? -p.width / 2 : p.width / 2,
-                size = p.cueSet3Direction === 'forward' ? p.height / 4 : p.height / 16,
-                speed = p.cueSet3Direction === 'forward' ? 36 : 24;
-
-
-            p.balls.push(
-                new NaturalBouncingBall(
-                    p, 
-                    x, 
-                    0, 
-                    0, 
-                    size, 
-                    speed,
-                    'forward',
-                    p.color(p.random(0, 360), 0, 25, 0.5),
-                    p.color(p.random(0, 360), 100, 100),
-                    false
-                )
-            );
+            
         }
 
         p.cueSet4Direction = 'forward-left';
@@ -213,72 +209,29 @@ const P5SketchWithAudio = () => {
         p.executeCueSet4 = (note) => {
             const { currentCue } = note;
 
-            if(currentCue % 7 === 6){
-                p.cueSet4Direction = p.cueSet4Direction === 'forward-right' ? 'forward-left' : 'forward-right';
+            if(currentCue < 55 || currentCue > 56) {
+                if(currentCue % 7 === 6){
+                    p.cueSet4Direction = p.cueSet4Direction === 'forward-right' ? 'forward-left' : 'forward-right';
+                }
+
+                const x = p.cueSet4Direction === 'forward-right' ? -p.width / 2 : p.width / 2;
+
+                p.balls.push(
+                    new NaturalBouncingBall(
+                        p, 
+                        x, 
+                        -p.height/2,
+                        0, 
+                        p.height / 8, 
+                        36,
+                        p.cueSet4Direction,
+                        p.color(p.random(0, 360), 100, 100),
+                        p.color(p.random(0, 360), 100, 0),
+                        false
+                    )
+                );
             }
-
-            const x = p.cueSet4Direction === 'forward-right' ? -p.width / 2 : p.width / 2;
-
-            p.balls.push(
-                new NaturalBouncingBall(
-                    p, 
-                    x, 
-                    -p.height/2, 
-                    0, 
-                    p.height / 8, 
-                    36,
-                    p.cueSet4Direction,
-                    p.color(p.random(0, 360), 100, 100),
-                    p.color(p.random(0, 360), 100, 0),
-                    false
-                )
-            );
-        }
-
-        p.loadBoxCorners = () => {
-            const dist = p.height / 2;
-            p.boxCorners = [
-                {
-                    x: -p.width/2,
-                    y: -p.height/2,
-                    z: 0
-                },
-                {
-                    x: p.width/2,
-                    y: -p.height/2,
-                    z: 0
-                },
-                {
-                    x: -p.width/2,
-                    y: p.height/2,
-                    z: 0
-                },
-                {
-                    x: p.width/2,
-                    y: p.height/2,
-                    z: 0
-                },
-                {
-                    x: -p.width/2,
-                    y: -p.height/2,
-                    z: -dist
-                },
-                {
-                    x: p.width/2,
-                    y: -p.height/2,
-                    z: -dist
-                },
-                {
-                    x: -p.width/2,
-                    y: p.height/2,
-                    z: -dist
-                },
-                {
-                    x: p.width/2,
-                    y: p.height/2,
-                    z: -dist
-                },
-            ];
+            
         }
 
         p.mousePressed = () => {
