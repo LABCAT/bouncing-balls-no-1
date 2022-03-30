@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.a60116e0.chunk.css",
+    "main.js": "/static/js/main.937d23ee.chunk.js",
+    "main.js.map": "/static/js/main.937d23ee.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.d586c4c7.js",
+    "runtime-main.js.map": "/static/js/runtime-main.d586c4c7.js.map",
+    "static/js/2.e5fd353c.chunk.js": "/static/js/2.e5fd353c.chunk.js",
+    "static/js/2.e5fd353c.chunk.js.map": "/static/js/2.e5fd353c.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/main.a60116e0.chunk.css.map": "/static/css/main.a60116e0.chunk.css.map",
+    "static/js/2.e5fd353c.chunk.js.LICENSE.txt": "/static/js/2.e5fd353c.chunk.js.LICENSE.txt",
+    "static/media/bouncing-balls-no-1.8b0fb17d.mid": "/static/media/bouncing-balls-no-1.8b0fb17d.mid",
+    "static/media/bouncing-balls-no-1.ea1ef4af.ogg": "/static/media/bouncing-balls-no-1.ea1ef4af.ogg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.d586c4c7.js",
+    "static/js/2.e5fd353c.chunk.js",
+    "static/css/main.a60116e0.chunk.css",
+    "static/js/main.937d23ee.chunk.js"
+  ]
+}
